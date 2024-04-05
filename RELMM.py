@@ -33,10 +33,11 @@ sphere.
 """
 
 import numpy as np
+import pymanopt
 from proj_simplex import proj_simplex
 from pymanopt.manifolds import Oblique
 from pymanopt import Problem
-from pymanopt.solvers import ConjugateGradient
+from pymanopt.optimizers import ConjugateGradient
 
 def RELMM(data,A_init,S0,lambda_S,lambda_S0):   
     
@@ -47,6 +48,7 @@ def RELMM(data,A_init,S0,lambda_S,lambda_S0):
     V = P*np.eye(P) - np.outer(np.ones(P),np.transpose(np.ones(P)))    
     
     
+    @pymanopt.function.numpy(Oblique(L, P))
     def cost(X):
 
         data_fit = np.zeros(N)    
@@ -58,6 +60,7 @@ def RELMM(data,A_init,S0,lambda_S,lambda_S0):
 
         return cost        
         
+    @pymanopt.function.numpy(Oblique(L, P))
     def egrad(X):
 
         partial_grad = np.zeros([L,P,N])    
@@ -137,8 +140,8 @@ def RELMM(data,A_init,S0,lambda_S,lambda_S0):
 
         manifold = Oblique(L, P)
         solver = ConjugateGradient()
-        problem = Problem(manifold=manifold, cost=cost, egrad = egrad)
-        S0 = solver.solve(problem)   
+        problem = Problem(manifold=manifold, cost=cost, euclidean_gradient=egrad)
+        S0 = solver.run(problem).point
    
 # termination checks    
 
