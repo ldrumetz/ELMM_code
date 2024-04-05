@@ -80,9 +80,9 @@ imr = np.transpose(im.reshape((N,L),order='F'))
 
 # unmixing with SCLSU
 
-start = time.clock()
+start = time.perf_counter()
 [A_SCLSU,psi_SCLSU,S_SCLSU] = SCLSU(imr,S0)
-end = time.clock()
+end = time.perf_counter()
 print(end - start)
 
 
